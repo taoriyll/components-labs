@@ -26,12 +26,10 @@ function isThere(word, letters) {
 
 asyncFilterPromise(arr, checkLetters)
     .then(result => {
-        console.log("Task 2:");
+        console.log("Task2:");
         console.log("Promise chaining result:", result);
     })
-    .catch(error => {
-        console.error("Error:", error);
-    });
+    .catch(error => console.error("Error:", error));
 
 async function asyncFilterAwait() {
     try {

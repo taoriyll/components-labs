@@ -57,3 +57,57 @@ function isThere(word, letters) {
 }
 
 asyncFilterParallel(arr1, checkLetters).then(result => console.log("Parallel result:", result));
+
+// Task 3 без аборта 
+const arr1 = ["application", "banana", "cola", "apex", "offset"];
+const checkLetters = "ope";
+
+function asyncFilterWithAbort(array, letters, controller) {
+    const results = [];
+    const signal = controller.signal; // Отримуємо сигнал від AbortController
+
+    const promises = array.map(item => {
+        return isThereWithAbort(item, letters, signal)
+            .then(hasLetters => {
+                if (hasLetters) results.push(item);  // без аборта
+            })
+            .catch(error => {
+                if (error.name === 'AbortError') {
+                    console.log(`Запит для "${item}" був скасований.`);
+                } else {
+                    throw error; // Інші помилки
+                }
+            });
+    });
+
+    return Promise.all(promises).then(() => results);
+}
+
+function isThereWithAbort(word, letters, signal) {
+    return new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+            const hasLetters = [...letters].every(letter => word.includes(letter));
+            resolve(hasLetters);
+        }, 1000);
+
+        // Перериваємо операцію, якщо спрацьовує сигнал
+        signal.addEventListener('abort', () => {
+            clearTimeout(timeoutId); // Очищуємо таймаут
+            reject(new DOMException("Операція була скасована", "AbortError"));
+        });
+    });
+}
+
+// Створення AbortController
+const controller = new AbortController();
+
+// Викликаємо функцію з AbortController
+asyncFilterWithAbort(arr1, checkLetters, controller)
+    .then(result => console.log("Result:", result))
+    .catch(error => console.error("Error:", error));
+
+// Скасовуємо запит через 1500 мс
+setTimeout(() => {
+    controller.abort();
+    console.log("Операції були скасовані.");
+}, 1500);
