@@ -11,8 +11,7 @@ function asyncFilterWithAbort(array, letters, controller) {
         return isThereWithAbort(item, letters, signal)
             .then(hasLetters => {
                 if (hasLetters){
-                    controller.abort(); // Скасовуємо всі інші запити
-                    results.push(item);
+                    if (hasLetters) results.push(item);
                 }
             })
             .catch(error => {
@@ -34,18 +33,17 @@ function isThereWithAbort(word, letters, signal) {
             resolve(hasLetters);
         }, 1000);
 
-        // Перериваємо операцію, якщо спрацьовує сигнал
         signal.addEventListener('abort', () => {
             clearTimeout(timeoutId);
-            reject(new DOMException("Операція була скасована", "AbortError"));
+            reject(new DOMException("Operation was canceled", "AbortError"));
         });
     });
 }
 
-// Створення AbortController
+// Create AbortController
 const controller = new AbortController();
 
-// Викликаємо функцію з AbortController
+// Call function from AbortController
 asyncFilterWithAbort(arr, checkLetters, controller)
     .then(result => {
         console.log("Task3:");
@@ -53,7 +51,7 @@ asyncFilterWithAbort(arr, checkLetters, controller)
     })
     .catch(error => console.error("Error:", error));
 
-// setTimeout(() => {
-//     controller.abort();
-//     console.log("Операції були скасовані.");
-// }, 1500);
+setTimeout(() => {
+    controller.abort();
+    console.log("Operations were canceled");
+}, 1500);
