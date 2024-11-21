@@ -6,21 +6,20 @@ const checkLetters = "la";
 function asyncFilterWithAbort(array, letters, controller) {
     const results = [];
     const signal = controller.signal;
-
-    const promises = array.map(item => {
-        return isThereWithAbort(item, letters, signal)
-            .then(hasLetters => {
-                if (hasLetters){
-                    if (hasLetters) results.push(item);
-                }
-            })
-            .catch(error => {
-                if (error.name === 'AbortError') {
-
-                } else {
-                    throw error;
-                }
-            });
+// try catch remove, redo res
+    const promises = array.map(async item => {
+        try {
+            const hasLetters = await isThereWithAbort(item, letters, signal);
+            if (hasLetters) {
+                if (hasLetters) results.push(item);
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log("Query is canceled.");
+            } else {
+                throw error;
+            }
+        }
     });
 
     return Promise.all(promises).then(() => results);
@@ -35,7 +34,7 @@ function isThereWithAbort(word, letters, signal) {
 
         signal.addEventListener('abort', () => {
             clearTimeout(timeoutId);
-            reject(new DOMException("Operation was canceled", "AbortError"));
+            reject(new Error("Operation was canceled"));
         });
     });
 }

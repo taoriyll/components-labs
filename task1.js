@@ -12,17 +12,16 @@ async function asyncFilter(array, letters) {
             results.push(item);
         }
     }
-
     return results;
 }
 
-async function isThere(word, letters) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const hasLetters = [...letters].every(letter => word.includes(letter));
-            resolve(hasLetters);
-        }, 1000); 
-    });
-}
+// async function isThere(word, letters) {
+//     return new Promise((resolve) => {
+//         setTimeout(() => {
+//             const hasLetters = [...letters].every(letter => word.includes(letter));
+//             resolve(hasLetters);
+//         }, 1000); 
+//     });
+// }
 
 asyncFilter(arr, checkLetters).then(res => console.log("Task1:", res)); 

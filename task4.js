@@ -8,6 +8,7 @@ function countWordInFile(filePath, targetWord) {
         stream.on('data', chunk => {
             const words = chunk.split(/\s+/);
             count += words.filter(word => word === targetWord).length;
+            // console.log(words);
         });
 
         stream.on('end', () => {
