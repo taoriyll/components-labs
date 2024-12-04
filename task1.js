@@ -6,10 +6,10 @@ const checkLetters = "ap";
 const checkLetters1 = "ope";
 
 function asyncFilter(array, letters, callback) {
-    const res = [];
+    const results = new Array(array.length).fill(null);
     let processed = 0;
 
-    array.forEach(item => {
+    array.forEach((item, index) => {
         isThere(item, letters, (err, hasLetters) => {
             if (err) {
                 callback(err);
@@ -17,12 +17,13 @@ function asyncFilter(array, letters, callback) {
             }
 
             if (hasLetters) {
-                res.push(item);
+                results[index] = item;
             }
 
             processed++;
             if (processed === array.length) {
-                callback(null, res); //null for error, res for hasLetters
+                // Filter out nulls before returning
+                callback(null, results.filter(Boolean));
             }
         });
     });
