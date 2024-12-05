@@ -16,7 +16,6 @@ function asyncFilterPromise(array, letters) {
     return Promise.all(promises).then(() => results.filter(item => item !== null)); // Filter out null values
 }
 
-// Counter to manage variable timeout
 let i = 0;
 
 function isThere(word, letters) {
