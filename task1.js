@@ -4,19 +4,22 @@ const arr = ["application", "banana", "cola", "apex", "offset"]; //ap
 const arr1 = ["dog", "topex", "cola", "operator", "offset"]; // ope
 const checkLetters = "ap";
 const checkLetters1 = "ope";
-
-function asyncFilter(array, letters, callback) {
+// змінити виклик
+function asyncFilter(array, check, callback) {
     const results = new Array(array.length).fill(null);
     let processed = 0;
+    let ifError = false;
 
     array.forEach((item, index) => {
-        isThere(item, letters, (err, hasLetters) => {
+        check(item, (err, success) => {
+            if(ifError) return;
             if (err) {
                 callback(err);
+                ifError = true;
                 return;
             }
 
-            if (hasLetters) {
+            if (success) {
                 results[index] = item;
             }
 
@@ -40,14 +43,14 @@ function isThere(word, letters, callback) {
     }, 1000);
 }
 
-asyncFilter(arr, checkLetters, (err, res) => {
+asyncFilter(arr, (item, callback) => isThere(item, checkLetters, callback), (err, res) => {
     if (err) {
         console.error("Error:", err);
     } else {
         console.log("Task1:", res);
     }
 });
-asyncFilter(arr1, checkLetters1, (err, res) => {
+asyncFilter(arr1, (item, callback) => isThere(item, checkLetters, callback), (err, res) => {
     if (err) {
         console.error("Error:", err);
     } else {

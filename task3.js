@@ -1,16 +1,13 @@
-// Task 3
-
 const arr = ["hero", "lantern", "banana", "cola", "apex", "latina"];
-const checkLetters = "la";
 
-function asyncFilterWithAbort(array, letters, controller) {
+function asyncFilterWithAbort(array, check, controller) {
     const results = new Array(array.length).fill(null);
     const signal = controller.signal;
 
     const promises = array.map((item, index) =>
-        isThereWithAbort(item, letters, signal)
-            .then(hasLetters => {
-                if (hasLetters) {
+        check(item, signal)
+            .then(success => {
+                if (success) {
                     results[index] = item;
                 }
             })
@@ -19,11 +16,11 @@ function asyncFilterWithAbort(array, letters, controller) {
     return Promise.all(promises).then(() => results.filter(Boolean));
 }
 
-function isThereWithAbort(word, letters, signal) {
+function ifThere(word, letters, signal) {
     return new Promise((resolve, reject) => {
         const timeoutId = setTimeout(() => {
-            const hasLetters = [...letters].every(letter => word.includes(letter));
-            resolve(hasLetters);
+            const success = [...letters].every(letter => word.includes(letter));
+            resolve(success);
         }, 2000);
 
         signal.addEventListener("abort", () => {
@@ -33,9 +30,10 @@ function isThereWithAbort(word, letters, signal) {
     });
 }
 
+// Create AbortController
 const controller = new AbortController();
 
-asyncFilterWithAbort(arr, checkLetters, controller)
+asyncFilterWithAbort(arr, (word, signal) => ifThere(word, "la", signal), controller)
     .then(result => {
         console.log("Task3:");
         console.log("Result:", result);

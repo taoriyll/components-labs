@@ -1,53 +1,49 @@
-// Task 2
 const arr = ["traitor", "banana", "predator", "apex", "offset"];
 const arr1 = ["creator", "banana", "apex", "offset"];
 const checkLetters = "or";
 
-// Promise-based asyncFilter function. All asynchronous operations (isThere calls) are initiated simultaneously using map
-function asyncFilterPromise(array, letters) {
+function asyncFilterPromise(array, check) {
     const results = new Array(array.length).fill(null);
 
     const promises = array.map((item, index) => {
-        return isThere(item, letters).then(hasLetters => {
-            if (hasLetters) results[index] = item; // Store item by its index
+        return check(item).then(success => {
+            if (success) results[index] = item; // Store item by its index
         });
     });
 
-    return Promise.all(promises).then(() => results.filter(item => item !== null)); // Filter out null values
+    return Promise.all(promises).then(() => results.filter(Boolean)); // Filter out null values
+}
+
+async function asyncFilterAwait(array, check) {
+    const results = new Array(array.length).fill(null);
+
+    for (let index = 0; index < array.length; index++) {
+        const success = await check(array[index]);
+        if (success) results[index] = array[index];
+    }
+
+    return results.filter(Boolean); // Filter out null values
 }
 
 let i = 0;
 
-function isThere(word, letters) {
+function ifThere(word, letters) {
     return new Promise((resolve) => {
         setTimeout(() => {
-            const hasLetters = [...letters].every(letter => word.includes(letter));
-            resolve(hasLetters);
-        }, 1500 - 100 * i);
-        i++;
+            const success = [...letters].every(letter => word.includes(letter));
+            resolve(success);
+        }, 1500 - 100 * i++);
     });
 }
 
-// Async/await based asyncFilter. Each asynchronous operation (isThere call) is initiated only after the previous one completes.
-async function asyncFilterAwait(array, letters) {
-    const results = new Array(array.length).fill(null);
-
-    for (let index = 0; index < array.length; index++) {
-        const hasLetters = await isThere(array[index], letters);
-        if (hasLetters) results[index] = array[index];
-    }
-
-    return results.filter(item => item !== null);
-}
-
-asyncFilterPromise(arr, checkLetters)
+asyncFilterPromise(arr, word => ifThere(word, checkLetters))
     .then(result => {
         console.log("Task2:");
         console.log("Promise result:", result);
     })
     .catch(error => console.error("Error:", error));
 
-asyncFilterAwait(arr1, checkLetters)
+asyncFilterAwait(arr1, word => ifThere(word, checkLetters))
     .then(result => {
         console.log("Async/await result:", result);
     })
